@@ -5,6 +5,9 @@ date: "18 June 2019"
 output: html_document
 ---
 
+## Code objective
+The objective of this code is to learn how to configure and use GitHub.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
