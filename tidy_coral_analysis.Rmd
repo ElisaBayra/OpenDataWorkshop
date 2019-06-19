@@ -56,7 +56,97 @@ benthic <- benthic %>%
 
 benthic
 
+```
 
+# Explore
+
+```{r explore the data}
+
+summary(benthic)
+
+skimr::skim(benthic)
+
+unique(benthic$date)
+unique(benthic$id_name)
+
+ggplot(benthic, aes(date, fill = id_name))+
+  geom_bar()
+
+```
+
+# Buoy Data
+
+```{r}
+
+# import buoy data
+
+# This doesn't work because it's not comma separated - it's a txt file
+buoy <- read_csv(buoy_url)
+head(buoy)
+
+# Try reading in the txt data again with read_table2
+buoy_raw <- read_table2(buoy_url)
+head(buoy_raw)
+
+```
+
+# Wrangle!
+```{r}
+buoy <- buoy_raw
+
+# 1. overwrite column names
+names(buoy) <- str_c(
+  names(buoy),
+  buoy %>% filter(`#YY` == "#yr"), # variable name with `#`
+  sep = "_")
+
+# Looks a lot better but not quite right
+names(buoy)
+
+# 2. clean up the slashes, get rif of `#` and `/`
+
+names(buoy) <- str_replace_all(names(buoy), "#", "")
+names(buoy) <- str_replace_all(names(buoy), "/", "")
+
+head(buoy)
+
+# 3. remove redundant second row
+buoy <- buoy %>%
+  filter(`YY_yr` != "#yr")
+```
+
+
+# Explore
+
+```{r}
+
+ggplot(buoy, aes(WTMP_degC))+
+  geom_bar()
+
+```
+
+# Join
+
+```{r}
+
+head(benthic)
+head(buoy)
+
+# unite buoy dates and create a new date column in buoy
+buoy <- buoy %>%
+  tidyr::unite(date, c(YY_yr, MM_mo, DD_dy), sep = "-")
+
+head(buoy)
+buoy$date
+
+# left-join benthic by date
+bb_join <- benthic %>%
+  left_join(buoy, by = "date")
+
+## let's select a few columns and inspect:
+bb_join %>%
+  select(id_name, x, y, date, hh_hr, mm_mn, WTMP_degC) %>%
+  head()
 
 ```
 
