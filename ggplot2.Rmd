@@ -3,17 +3,180 @@ title: "Graphics with ggplot2"
 author: "Elisa Bayraktarov"
 date: "18 June 2019"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Code objective
 The objective of this code is to see how to configure and use GitHub. The second part of this code is to produce graphics with ggplot2
 
+Don't forget, the shortcut for chunks is:
+Ctrl + Alt + I
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r loading packages, include=TRUE}
 library(tidyverse)
+library(ggplot2)
+
+```
+
+You can also read in data from webpages e.g. from GitHub, so get the data from GitHub:
+```{r data}
+
+ohi_data <-read_csv("https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/OHI_global_data.csv")
+
+head(ohi_data)
+summary(ohi_data)
+
+# the first part is the dataframe and the part after the $ is the column
+table(ohi_data$georegion_one)
+table(ohi_data$georegion_two)
+
+# how big is the data (giving raws and columns)
+dim(ohi_data)
+
+```
+
+Let's plot the data:
+```{r start ggplot}
+
+# First line of the ggplot is the dataframe and telling inside of the aes what the x and y axes are:
+ggplot(data=ohi_data, aes(x=georegion_one, y=OHI_score))+
+  geom_point()
+
+ggplot(data=ohi_data, aes(x=georegion_one, y=OHI_score))+
+  geom_jitter(width=0.1)
+
+?geom_jitter
+```
+
+Let's do a boxplot:
+```{r boxplot}
+ggplot(data=ohi_data, aes(x=georegion_one))+
+  geom_bar(width=0.9)
+
+```
+
+Let's do a Histogram:
+```{r hist}
+
+ggplot(data=ohi_data, aes(x=HDI))+
+  geom_histogram()
+
+```
+
+Multiples geoms exploration:
+
+```{r multiple geoms}
+
+ohi_summary <- read_csv("https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/OHI_scores_georegion_summary.csv")
+
+# bar plot is produced with the same values as in the data
+ggplot(data=ohi_summary, aes(x=georegions, y=OHI_score_average))+
+  geom_bar(stat="identity")+
+  geom_jitter(data = ohi_data, aes(x = georegion_one, y = OHI_score), width = 0.1)
+
+# Are the next 2 arguments the same? - yes they are
+ggplot(data = ohi_data, aes(y=OHI_score, x = HDI, color=georegion_one)) +
+  geom_point()
+
+# it's better to put the aes with teh geoms if you put many layers of plots on top of each other  
+ggplot(data = ohi_data) +
+  geom_point(aes(y = OHI_score, x = HDI, color=georegion_one))
+
+# Here are some examples of aes arguments:  
+# color color of lines/points
+# fill color within polygons
+# label name
+# linetype type of line
+# shape style of point
+# alpha transparency (0-1)
+# size size of shape
+
+```
+
+
+Adding a third varibale with aes
+```{r}
+
+ggplot(data=ohi_data, aes(x = OHI_score, y = HDI, size = coastal_pop))+
+  geom_point()
+
+ggplot(data=ohi_data, aes(x = OHI_score, y = HDI, color = coastal_pop))+
+  geom_point()
+
+ggplot(data=ohi_data, aes(x = OHI_score, y = HDI, alpha = coastal_pop))+
+  geom_point()
+
+```
+
+Adding a third discreate variable with aes
+```{r}
+
+ggplot(data=ohi_data, aes(x = OHI_score, y = HDI, color = georegion_one))+
+  geom_point()
+
+ggplot(data=ohi_data, aes(x = OHI_score, y = HDI, shape = georegion_one))+
+  geom_point()
+
+```
+
+Make prettier plots by using Themes
+theme_bw() is just a pre-set theme of black and white
+```{r}
+
+ggplot(data=ohi_data, aes(x = OHI_score, y = HDI))+
+  geom_point()+
+  theme_bw()
+
+source('https://raw.githubusercontent.com/OHI-Science/ohiprep/master/src/R/scatterTheme.txt')    
+
+ggplot(data=ohi_data, aes(x = OHI_score, y = HDI))+
+  geom_point()+
+  scatterTheme
 
 
 ```
+
+Change labels
+```{r}
+
+ggplot(data = ohi_data, aes(OHI_score, x = HDI, color = georegion_one))+
+  geom_point()+
+      labs(y = "OHI score, 2017",
+       x = "Human Development Index",
+       title = "Countries with high human development have more sustainable oceans",
+      color = "Georegion") +  # if color doesn't work, use "fill"
+     theme_bw()
+
+```
+
+
+```{r}
+# install.packages("RColorBrewer")
+library(RColorBrewer)
+display.brewer.all()
+
+my_palette <- brewer.pal(n=9, "YlOrRd")
+
+ggplot(data = ohi_data, aes(x = OHI_score, y = OHI_trend, color = HDI)) + 
+  geom_point(size =3) +
+  scale_colour_gradientn(colors = my_palette)
+
+ggplot(data = ohi_data, aes(x = OHI_score, y = OHI_trend, color = HDI)) + 
+  geom_point(size =3) +
+  scale_colour_gradientn(colors = c("blue", "green"))
+
+# lets use a discrete color scale
+my_palette <- brewer.pal(n=12, "Set3")
+
+ggplot(data = ohi_data, aes(x = OHI_score, y = HDI, color = georegion_one)) + 
+  geom_point(size = 3) +
+  scale_color_manual(values = my_palette)
+
+```
+
+
