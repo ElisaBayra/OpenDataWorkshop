@@ -70,4 +70,71 @@ mean(x$lifeExp)
 
 ```
 
+Learning the select() function
+```{r}
+
+# select only these columns:
+select(gapminder, year, country, lifeExp)
+
+# drop some columns from the dataset;
+select(gapminder, -continent, -gdpPercap, -pop)
+
+```
+
+Using filter() and slect together
+```{r}
+
+## instead of this...
+gap_cambodia  <- filter(gapminder, country == "Cambodia")
+gap_cambodia2 <- select(gap_cambodia, -continent, -lifeExp) 
+
+## ...we can do this
+gap_cambodia  <- gapminder %>% filter(country == "Cambodia")
+gap_cambodia2 <- gap_cambodia %>% select(-continent, -lifeExp) 
+
+```
+
+The pipe operator %>% 
+Ctrl + Shift + m
+```{r}
+
+gapminder %>% head()
+head(gapminder)
+
+# the pipe: take gapminder (on the left) and then give me the head (what's on the right)
+
+
+## instead of this...
+gap_cambodia  <- filter(gapminder, country == "Cambodia") %>% #and then
+select(-continent, -lifeExp)
+
+
+gap_cambodia  <- gapminder %>% 
+  filter(country == "Cambodia") %>% #and then
+  select(-continent, -lifeExp)
+
+# We want year, pop and gdpPercap for Cambodia only. We use the pipe: Take the gapminder dataframe, and then filter for the country of Cambodia and then select all columns except for continent and lifeExp
+
+gap_cambodia
+```
+
+
+Learn mutate() which adds a new column and calls it as you want it to call e.g. gdp
+```{r}
+
+gapminder %>%
+  mutate(gdp = pop*gdpPercap)
+
+# Take the dataframe gapminder and then make a new column called gdp which is the population times the gdpPercap
+
+# Calculate the population in thousands for all Asian countries in the year 2007 and add it as a new column. Then show a new dataframe which has country, year and population in thousands
+
+head(gapminder)
+
+gapminder %>% 
+  filter(continent =="Asia", year == 2007) %>% 
+  mutate(population_in_thousands = pop/1000) %>% 
+  select(country, year, population_in_thousands)
+
+```
 
