@@ -1,0 +1,73 @@
+---
+title: "Data wrangling with dplyr"
+author: "Elisa Bayraktarov"
+date: "19 June 2019"
+output: html_document
+---
+## Code Objective
+- discuss tidy data
+- read data from online into R
+- explore gapminder data with base-R functions
+- wrangle gapminder data with dplyr tidyverse functions
+- practice RStudio-GitHub workflow
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Loading the tidyverse
+```{r packages}
+library(tidyverse)
+
+```
+
+Load the data
+```{r}
+# loading the gapminder dataset from github
+gapminder <-read_csv("https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/gapminder.csv")
+
+head(gapminder)
+
+summary(gapminder)
+
+# shows the last 6 records
+tail(gapminder)
+
+# this shows you the structure of the data, the data is a data.frame
+str(gapminder)
+
+# Show me the name of the columns
+names(gapminder)
+
+# give me the number of columns:
+ncol(gapminder)
+
+# the variables e.g. countries are columns
+# every raw is a unique observation
+
+```
+
+Look at individual dataframe variables
+```{r}
+# show the lifeExp column
+
+gapminder$lifeExp
+gapminder$continent
+
+```
+
+Learning the filter() function
+```{r}
+
+filter(gapminder, lifeExp < 30)
+
+# filter for observations only where the country equals Mexico only; just look at Mexico and only for observations in year 2002
+filter(gapminder, country == "Mexico", year == 2002)
+
+x <- filter(gapminder, country == "Brazil", year >= 1987, year <= 2007)
+
+mean(x$lifeExp)
+
+```
+
+
